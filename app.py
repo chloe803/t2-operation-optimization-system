@@ -1,6 +1,5 @@
 from pathlib import Path
 import math
-import time
 
 import pandas as pd
 import plotly.express as px
@@ -272,7 +271,7 @@ def recalc_im_rows(df):
     return df
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_resource(show_spinner=False)
 def load_data(file_mtime):
     df = pd.read_csv(DATA_PATH, encoding="utf-8-sig", compression="infer")
 
@@ -859,21 +858,19 @@ if st.session_state.get("session_key") != session_key:
     st.session_state["live_elapsed"] = 0
 
 
+def render_off_view():
+    chart, window_label, data_time = make_chart_data(
+        df=df,
+        date=selected_date,
+        area=selected_area,
+        selected_time=selected_time,
+        mode="OFF",
+    )
 
-chart, window_label, data_time = make_chart_data(
-    df=df,
-    date=selected_date,
-    area=selected_area,
-    selected_time=selected_time,
-    mode=mode,
-)
+    current = current_snapshot(df, selected_date, data_time, selected_area)
+    y_title = axis_name(selected_area)
+    suffix = area_suffix(selected_area)
 
-current = current_snapshot(df, selected_date, data_time, selected_area)
-y_title = axis_name(selected_area)
-suffix = area_suffix(selected_area)
-
-
-if mode == "OFF":
     st.subheader(f"🗓️ {selected_date} {selected_time} 데이터 기준 시각")
 
     st.markdown(
@@ -943,7 +940,19 @@ if mode == "OFF":
             metric_card("계획 직원", fmt_num(row["계획총직원수"]), "명")
 
 
-else:
+def render_live_view():
+    chart, window_label, data_time = make_chart_data(
+        df=df,
+        date=selected_date,
+        area=selected_area,
+        selected_time=selected_time,
+        mode="LIVE",
+    )
+
+    current = current_snapshot(df, selected_date, data_time, selected_area)
+    y_title = axis_name(selected_area)
+    suffix = area_suffix(selected_area)
+
     st.subheader(f"🟢 {selected_date} {data_time} 데이터 기준 시각")
 
     add_count = int((current["조정판단"] == "추가 필요").sum())
@@ -1102,5 +1111,18 @@ else:
     if current_live_end < end_min:
         st.session_state["live_elapsed"] = int(st.session_state.get("live_elapsed", 0)) + 1
 
-    time.sleep(refresh_seconds)
-    st.rerun()
+
+if mode == "OFF":
+    render_off_view()
+else:
+    if not hasattr(st, "fragment"):
+        st.error("현재 Streamlit 버전이 st.fragment를 지원하지 않습니다. requirements.txt에서 streamlit>=1.37.0으로 올려야 합니다.")
+        st.stop()
+
+    live_run_every = f"{int(refresh_seconds)}s"
+
+    @st.fragment(run_every=live_run_every)
+    def live_fragment():
+        render_live_view()
+
+    live_fragment()
