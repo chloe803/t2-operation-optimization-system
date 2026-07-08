@@ -843,10 +843,10 @@ with st.sidebar:
         index=0,
     )
 
-    refresh_seconds = 5
+    refresh_seconds = 20
 
     if mode == "LIVE":
-        refresh_seconds = st.selectbox("LIVE 갱신 간격", [3, 5, 10, 30], index=1)
+        refresh_seconds = st.selectbox("LIVE 갱신 간격", [10, 20, 30, 60], index=1)
 
     st.caption("OFF: 항공편 기반 운영계획만 표시")
     st.caption("LIVE: 인원수 데이터를 실시간 센서값처럼 순차 반영")
@@ -857,6 +857,7 @@ session_key = f"{selected_date}|{selected_area}|{selected_time}|{mode}"
 if st.session_state.get("session_key") != session_key:
     st.session_state["session_key"] = session_key
     st.session_state["live_elapsed"] = 0
+
 
 
 chart, window_label, data_time = make_chart_data(
