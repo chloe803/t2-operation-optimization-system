@@ -660,7 +660,7 @@ def draw_line_chart(chart, title_text, y_title):
         rangemode="tozero",
     )
 
-    st.plotly_chart(fig, width="stretch")
+    st.plotly_chart(fig, use_container_width=True)
 
 
 def draw_current_bar(current):
@@ -714,7 +714,7 @@ def draw_current_bar(current):
         rangemode="tozero",
     )
 
-    st.plotly_chart(fig, width="stretch")
+    st.plotly_chart(fig, use_container_width=True)
 
 
 def operation_table_off(current):
@@ -917,7 +917,7 @@ if mode == "OFF":
         with st.expander("구역별 운영계획 표 보기", expanded=False):
             st.dataframe(
                 operation_table_off(current),
-                width="stretch",
+                use_container_width=True,
                 hide_index=True,
             )
 
@@ -1047,7 +1047,7 @@ else:
         with st.expander("실시간 구역별 보정표 보기", expanded=False):
             st.dataframe(
                 operation_table_live(current),
-                width="stretch",
+                use_container_width=True,
                 hide_index=True,
             )
 
