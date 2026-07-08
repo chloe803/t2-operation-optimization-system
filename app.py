@@ -42,8 +42,8 @@ UNIT_MAP["IM2"] = "출입문"
 # =========================================================
 IM_MAX_GATES = 6
 IM_MIN_ACTIVE_GATES = 3
-IM1_PEOPLE_PER_GATE = 35
-IM2_PEOPLE_PER_GATE = 25
+IM1_PEOPLE_PER_GATE = 30
+IM2_PEOPLE_PER_GATE = 30
 
 
 NUMERIC_COLS = [
